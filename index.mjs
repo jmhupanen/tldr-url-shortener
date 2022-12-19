@@ -1,6 +1,5 @@
 import express from 'express';
 import * as dotenv from 'dotenv';
-import { readFile } from 'fs/promises';
 import { google } from 'googleapis';
 import apicache from 'apicache';
 import { nanoid } from 'nanoid';
@@ -9,11 +8,7 @@ const app = express();
 
 dotenv.config();
 
-const customKeywords = JSON.parse(
-  await readFile(
-    new URL('./custom-keywords.json', import.meta.url)
-  )
-);
+const customKeywords = JSON.parse(process.env.CUSTOM_KEYWORDS);
 
 let cache = apicache.middleware;
 app.use(cache('10 minutes'));
