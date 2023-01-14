@@ -1,5 +1,7 @@
 import express from 'express';
 import * as dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { google } from 'googleapis';
 import apicache from 'apicache';
 import { nanoid } from 'nanoid';
@@ -7,6 +9,9 @@ import { nanoid } from 'nanoid';
 const app = express();
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const customKeywords = JSON.parse(process.env.CUSTOM_KEYWORDS);
 
@@ -20,7 +25,7 @@ const youtube = google.youtube({
 
 
 app.get('/', (req, res) => {
-  res.send('Welcome to TLDR - the greatest ever URL shortener!');
+  res.sendFile(path.join(__dirname, '/index.html'));
 });
 
 app.get('/*', async (req, res, next) => {
