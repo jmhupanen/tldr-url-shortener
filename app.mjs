@@ -4,11 +4,15 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { google } from 'googleapis';
 import apicache from 'apicache';
-import { nanoid } from 'nanoid';
+
+import connectDB from './config/db.mjs';
+import shortenerRouter from './routes/shortener.mjs';
 
 const app = express();
 
 dotenv.config();
+
+connectDB();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,6 +21,8 @@ const customKeywords = JSON.parse(process.env.CUSTOM_KEYWORDS);
 
 let cache = apicache.middleware;
 app.use(cache('10 minutes'));
+
+app.use(express.json());
 
 const youtube = google.youtube({
   version: 'v3',
@@ -27,6 +33,8 @@ const youtube = google.youtube({
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '/index.html'));
 });
+
+app.use('/api', shortenerRouter);
 
 app.get('/*', async (req, res, next) => {
   let customRoute;

@@ -10,6 +10,20 @@
       integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" 
       crossorigin="anonymous"
     />
+    <script type="text/javascript">
+      function shorten() {
+        fetch(location.origin + '/api/shorten', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ "origUrl": document.getElementById("urlInput").value })
+        })
+        .then(response => response.json())
+        .then(response => console.log(JSON.stringify(response)));
+      };
+    </script>
   </head>
 
   <body>
@@ -27,16 +41,15 @@
       <div class="row">
         <div class="col justify-content-center input-group">
           <input 
-            type=”url” 
+            type="url" 
             class="form-control" 
             placeholder="https://example.com" 
             aria-label="URL to be shortened" 
             aria-describedby="basic-addon2" 
-            id=”urlinput”
+            id="urlInput"
           >
           <div class="input-group-append">
-            <button type="button" class="btn btn-primary" onclick="alert('Work in progress, hold on there!')">TLDRize</button>
-            <!-- <script src=”scriptSource.js”></script> -->
+            <button type="button" class="btn btn-primary" onclick="shorten()">TLDRize</button>
           </div>
         </div>
       </div>
