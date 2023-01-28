@@ -22,6 +22,7 @@ const customKeywords = JSON.parse(process.env.CUSTOM_KEYWORDS);
 let cache = apicache.middleware;
 app.use(cache('10 minutes'));
 
+app.set('trust proxy', true);
 app.use(express.json());
 
 const youtube = google.youtube({
