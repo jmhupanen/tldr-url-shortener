@@ -20,7 +20,6 @@ const __dirname = path.dirname(__filename);
 const customKeywords = JSON.parse(process.env.CUSTOM_KEYWORDS);
 
 let cache = apicache.middleware;
-app.use(cache('10 minutes'));
 
 app.set('trust proxy', true);
 app.use(express.json());
@@ -37,7 +36,7 @@ app.get('/', (req, res) => {
 
 app.use('/api', shortenerRouter);
 
-app.get('/*', async (req, res, next) => {
+app.get('/*', cache('10 minutes'), async (req, res, next) => {
   let customRoute;
   customKeywords.youtube.keywords.map(keyword => {
     if(req.path === `/${keyword.name}`) {

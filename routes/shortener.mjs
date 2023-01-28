@@ -10,7 +10,7 @@ const router = express.Router();
 const validateUrl = (urlString) => {
   try {
     const url = new URL(urlString);
-    return url;
+    return url.href;
   } catch (err) {
     return null;
   }
@@ -37,24 +37,30 @@ const getOrigin = async (originIp) => {
 	}
 };
 
+// The actual URL shortener
 router.post('/shorten', async (req, res) => {
   const { origUrl } = req.body;
   const url = validateUrl(origUrl);
 
   if (url) {
     try {
-      // TODO: Check if already exists
-
-      console.log(req.ip);
-      const origin = await getOrigin(req.ip);
-      const newUrl = new Url({
-        id: nanoid(5),
-        url: url,
-        origin: origin
-      });
-      await newUrl.save();
-      console.log('New URL saved');
-      res.json(url);
+      // Return existing if found. Otherwise, generate a new one
+      console.log(url);
+      let foundUrl = await Url.findOne({ url: url });
+      if (foundUrl) {
+        res.json(foundUrl);
+      } else {
+        // TODO: Check for duplicate id
+        const origin = await getOrigin(req.ip);
+        const newUrl = new Url({
+          id: nanoid(5),
+          url: url,
+          origin: origin
+        });
+        await newUrl.save();
+        console.log('New URL saved');
+        res.json(newUrl);
+      }
     } catch (err) {
       console.log(err);
       res.status(500).send(err.message);

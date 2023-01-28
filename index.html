@@ -11,17 +11,25 @@
       crossorigin="anonymous"
     />
     <script type="text/javascript">
-      function shorten() {
-        fetch(location.origin + '/api/shorten', {
+      const shorten = async () => {
+        const url = document.getElementById("urlInput").value;
+        const response = await fetch(location.origin + '/api/shorten', {
           method: 'POST',
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ "origUrl": document.getElementById("urlInput").value })
+          body: JSON.stringify({ "origUrl": url })
         })
         .then(response => response.json())
-        .then(response => console.log(JSON.stringify(response)));
+        .then(response => {
+          console.log(JSON.stringify(response));
+          document.getElementById("urlInput").value = "";
+          document.getElementById("originalLinkTitle").style.visibility = "visible";
+          document.getElementById("shortLinkTitle").style.visibility = "visible";
+          document.getElementById("originalLink").innerHTML = response.url;
+          document.getElementById("shortLink").innerHTML = `${location.origin}/${response.id}`;
+        });
       };
     </script>
   </head>
@@ -51,6 +59,18 @@
           <div class="input-group-append">
             <button type="button" class="btn btn-primary" onclick="shorten()">TLDRize</button>
           </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <p style="visibility:hidden;" class="text-center" id="originalLinkTitle">Original link: </p>
+          <p class="text-center" id="originalLink"></p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <p style="visibility:hidden;" class="text-center" id="shortLinkTitle">Short link: </p>
+          <p class="text-center" id="shortLink"></p>
         </div>
       </div>
     </div>
