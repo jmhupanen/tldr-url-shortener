@@ -46,7 +46,7 @@ router.post('/shorten', async (req, res) => {
     try {
       // Return existing if found. Otherwise, generate a new one
       console.log(url);
-      let foundUrl = await Url.findOne({ url: url });
+      const foundUrl = await Url.findOne({ url: url });
       if (foundUrl) {
         res.json(foundUrl);
       } else {
