@@ -7,6 +7,7 @@ const IP_LOCATION_API_URL = 'http://ip-api.com/json';
 
 const router = express.Router();
 
+
 const validateUrl = (urlString) => {
   try {
     const url = new URL(urlString);
@@ -36,6 +37,7 @@ const getOrigin = async (originIp) => {
     return 'Unknown';
 	}
 };
+
 
 // The actual URL shortener
 router.post('/shorten', async (req, res) => {

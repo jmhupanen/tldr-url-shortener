@@ -21,6 +21,17 @@ const youtube = google.youtube({
 });
 
 
+const getCustomRoute = (id) => {
+  let route = null;
+  CUSTOM_KEYWORDS.youtube.keywords.map(keyword => {
+    if (keyword.name === id) {
+      route = keyword;
+    }
+  });
+  return route;
+};
+
+
 router.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../index.html'));
 });
@@ -28,14 +39,8 @@ router.get('/', (req, res) => {
 // Redirect if ID exists
 router.get('/:id', cache('10 minutes'), async (req, res, next) => {
   const id = req.params.id;
-  let customRoute;
+  const customRoute = getCustomRoute(id);
   let foundUrl;
-
-  CUSTOM_KEYWORDS.youtube.keywords.map(keyword => {
-    if (id === keyword.name) {
-      customRoute = keyword;
-    }
-  });
 
   if (customRoute) {
     // Predefined IDs
@@ -46,8 +51,8 @@ router.get('/:id', cache('10 minutes'), async (req, res, next) => {
         order: 'date',
         maxResults: 1
       });
-      const id = response.data.items[0].id.videoId;
-      res.redirect(`https://www.youtube.com/watch?v=${id}`);
+      const videoId = response.data.items[0].id.videoId;
+      res.redirect(`https://www.youtube.com/watch?v=${videoId}`);
     } catch (err) {
       next(err);
     }
