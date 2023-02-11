@@ -2,7 +2,7 @@
 <html lang="en">
 
   <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1" />
     <title>TLDR - URL Shortener</title>
     <link 
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" 
@@ -23,23 +23,63 @@
 
       const shorten = async () => {
         const url = document.getElementById("urlInput").value;
-        const response = await fetch(location.origin + '/api/shorten', {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ "origUrl": url })
-        })
-        .then(response => response.json())
-        .then(response => {
-          console.log(JSON.stringify(response));
-          document.getElementById("urlInput").value = "";
-          document.getElementById("originalLinkTitle").style.visibility = "visible";
-          document.getElementById("shortLinkTitle").style.visibility = "visible";
-          document.getElementById("originalLink").innerHTML = response.url;
-          document.getElementById("shortLink").innerHTML = `${location.origin}/${response.id} <button type="button" class="btn btn-secondary btn-sm" id="copyButton" onclick="copyToClipboard()"><i class="bi-clipboard2"></i></button>`;
-        });
+        const validUrl = validateUrl(url);
+        if (validUrl) {
+          const response = await fetch(location.origin + '/api/shorten', {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ "origUrl": url })
+          })
+          .then((response) => {
+            return new Promise((resolve) => response.json()
+              .then((json) => resolve({
+                status: response.status,
+                ok: response.ok,
+                json,
+              })));
+          })
+          .then(({ status, json, ok }) => {
+            console.log("Status: " + status + ", Response: " + JSON.stringify(json));
+            if (ok) {
+              displayResults(json);
+            } else {
+              displayError();
+            }
+          });
+        } else {
+          displayError();
+        }
+      };
+
+      const validateUrl = (urlString) => {
+        try {
+          const url = new URL(urlString);
+          return url.href;
+        } catch (err) {
+          return null;
+        }
+      };
+
+      const displayResults = (json) => {
+        // Hide possible errors
+        if (document.getElementById("urlInput").classList.contains("is-invalid")) {
+          document.getElementById("urlInput").classList.remove("is-invalid");
+          document.getElementById("urlValidationFeedback").style.visibility = "hidden";
+        }
+        // Show results
+        document.getElementById("urlInput").value = "";
+        document.getElementById("originalLinkTitle").style.visibility = "visible";
+        document.getElementById("shortLinkTitle").style.visibility = "visible";
+        document.getElementById("originalLink").innerHTML = json.url;
+        document.getElementById("shortLink").innerHTML = `${location.origin}/${json.id} <button type="button" class="btn btn-secondary btn-sm" id="copyButton" onclick="copyToClipboard()"><i class="bi-clipboard2"></i></button>`;
+      };
+
+      const displayError = () => {
+        document.getElementById("urlInput").classList.add("is-invalid");
+        document.getElementById("urlValidationFeedback").style.visibility = "visible";
       };
 
       const copyToClipboard = () => {
@@ -61,8 +101,8 @@
           <p class="text-center">The greatest URL shortener ever</p>
         </div>
       </div>
-      <div class="row mb-3">
-        <div class="col justify-content-center input-group">
+      <div class="row">
+        <div class="col-12 mb-3">
           <input 
             type="url" 
             class="form-control" 
@@ -70,10 +110,14 @@
             aria-label="URL to be shortened" 
             aria-describedby="basic-addon2" 
             id="urlInput"
+            required
           >
-          <div class="input-group-append">
-            <button type="button" class="btn btn-primary" id="submitButton" onclick="shorten()">TLDRize</button>
+          <div style="visibility:hidden;" id="urlValidationFeedback" class="invalid-feedback">
+            Please provide a valid URL
           </div>
+        </div>
+        <div class="mb-3 text-center">
+          <button type="button" class="btn btn-primary" id="submitButton" onclick="shorten()">TLDRize</button>
         </div>
       </div>
       <div class="row">
