@@ -1,6 +1,6 @@
-FROM debian:bullseye as builder
+FROM debian:bookworm as builder
 
-ARG NODE_VERSION=18.12.1
+ARG NODE_VERSION=20
 
 RUN apt-get update; apt install -y curl
 RUN curl https://get.volta.sh | bash
@@ -22,7 +22,7 @@ ENV NODE_ENV production
 COPY . .
 
 RUN npm install
-FROM debian:bullseye
+FROM debian:bookworm
 
 LABEL fly_launch_runtime="nodejs"
 
