@@ -12,7 +12,7 @@ app.use(express.json());
 connectDB();
 
 app.use('/api', shortenRouter);
-
+app.use(express.static('public'));
 app.use('/', indexRouter);
 
 // Server setup
