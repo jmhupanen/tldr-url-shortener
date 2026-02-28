@@ -5,13 +5,245 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="TLDR - The greatest URL shortener ever">
     <title>TLDR - URL Shortener</title>
-    <link 
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" 
-      rel="stylesheet"
-      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" 
-      crossorigin="anonymous"
-      rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'"
-    />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+      *, *::before, *::after { box-sizing: border-box; }
+
+      body {
+        font-family: 'Inter', sans-serif;
+        background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 60%, #16213e 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        color: #e8e8f0;
+      }
+
+      /* Subtle animated orbs in the background */
+      body::before,
+      body::after {
+        content: '';
+        position: fixed;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.15;
+        pointer-events: none;
+        animation: drift 12s ease-in-out infinite alternate;
+      }
+      body::before {
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, #6c63ff, transparent 70%);
+        top: -100px;
+        left: -100px;
+      }
+      body::after {
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, #4facfe, transparent 70%);
+        bottom: -80px;
+        right: -80px;
+        animation-direction: alternate-reverse;
+      }
+      @keyframes drift {
+        from { transform: translate(0, 0); }
+        to   { transform: translate(40px, 30px); }
+      }
+
+      .main-card {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border-radius: 24px;
+        box-shadow:
+          0 32px 64px rgba(0, 0, 0, 0.6),
+          0 0 0 1px rgba(108, 99, 255, 0.15),
+          inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        padding: 3rem 2.5rem;
+        width: 100%;
+        max-width: 560px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .logo {
+        font-size: 4.5rem;
+        font-weight: 900;
+        letter-spacing: -2px;
+        line-height: 1;
+        background: linear-gradient(135deg, #a78bfa 0%, #6c63ff 40%, #4facfe 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.25rem;
+      }
+
+      .tagline {
+        color: rgba(255, 255, 255, 0.45);
+        font-size: 0.95rem;
+        font-weight: 400;
+        letter-spacing: 0.02em;
+        margin-bottom: 2.5rem;
+      }
+
+      .input-group-custom {
+        position: relative;
+        margin-bottom: 0.5rem;
+      }
+
+      .url-input {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 12px;
+        color: #e8e8f0;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.95rem;
+        padding: 0.85rem 1.1rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        outline: none;
+      }
+      .url-input::placeholder {
+        color: rgba(255, 255, 255, 0.25);
+      }
+      .url-input:focus {
+        border-color: rgba(108, 99, 255, 0.6);
+        box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2), 0 0 20px rgba(108, 99, 255, 0.1);
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .url-input.is-invalid {
+        border-color: rgba(239, 68, 68, 0.7);
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18);
+      }
+
+      .error-msg {
+        color: #f87171;
+        font-size: 0.82rem;
+        margin-top: 0.4rem;
+        display: none;
+        padding-left: 0.25rem;
+      }
+      .error-msg.visible {
+        display: block;
+      }
+
+      .btn-shorten {
+        width: 100%;
+        background: linear-gradient(135deg, #6c63ff 0%, #4facfe 100%);
+        border: none;
+        border-radius: 12px;
+        color: #fff;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        padding: 0.85rem 1.5rem;
+        margin-top: 0.75rem;
+        cursor: pointer;
+        transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+        box-shadow: 0 4px 20px rgba(108, 99, 255, 0.35);
+      }
+      .btn-shorten:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(108, 99, 255, 0.5);
+        opacity: 0.92;
+      }
+      .btn-shorten:active {
+        transform: translateY(0);
+        box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+      }
+
+      .result-card {
+        background: rgba(108, 99, 255, 0.08);
+        border: 1px solid rgba(108, 99, 255, 0.25);
+        border-radius: 14px;
+        padding: 1.25rem 1.4rem;
+        margin-top: 1.75rem;
+        display: none;
+        animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+      .result-card.visible {
+        display: block;
+      }
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(12px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      .result-label {
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.35);
+        margin-bottom: 0.25rem;
+      }
+
+      .result-original {
+        color: rgba(255, 255, 255, 0.55);
+        font-size: 0.85rem;
+        word-break: break-all;
+        margin-bottom: 1rem;
+      }
+
+      .result-divider {
+        border: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.07);
+        margin-bottom: 1rem;
+      }
+
+      .result-short-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .result-short-link {
+        color: #a78bfa;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        word-break: break-all;
+        flex: 1;
+        transition: color 0.15s;
+      }
+      .result-short-link:hover {
+        color: #c4b5fd;
+        text-decoration: underline;
+      }
+
+      .btn-copy {
+        background: rgba(108, 99, 255, 0.2);
+        border: 1px solid rgba(108, 99, 255, 0.4);
+        border-radius: 8px;
+        color: #a78bfa;
+        font-size: 0.8rem;
+        font-weight: 500;
+        padding: 0.35rem 0.75rem;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        flex-shrink: 0;
+      }
+      .btn-copy:hover {
+        background: rgba(108, 99, 255, 0.35);
+        color: #c4b5fd;
+      }
+      .btn-copy.copied {
+        background: rgba(34, 197, 94, 0.2);
+        border-color: rgba(34, 197, 94, 0.4);
+        color: #4ade80;
+      }
+    </style>
     <script type="text/javascript">
       window.onload = () => {
         const input = document.getElementById("urlInput");
@@ -26,7 +258,7 @@
         const url = document.getElementById("urlInput").value;
         const validUrl = validateUrl(url);
         if (validUrl) {
-          const response = await fetch(location.origin + '/api/shorten', {
+          await fetch(location.origin + '/api/shorten', {
             method: 'POST',
             headers: {
               'Accept': 'application/json',
@@ -65,72 +297,84 @@
       };
 
       const displayResults = (json) => {
-        // Hide possible errors
-        if (document.getElementById("urlInput").classList.contains("is-invalid")) {
-          document.getElementById("urlInput").classList.remove("is-invalid");
-          document.getElementById("urlValidationFeedback").style.visibility = "hidden";
-        }
-        // Show results
+        clearError();
+
+        const shortUrl = `${location.origin}/${json.id}`;
+
         document.getElementById("urlInput").value = "";
-        document.getElementById("originalLinkTitle").style.visibility = "visible";
-        document.getElementById("shortLinkTitle").style.visibility = "visible";
-        document.getElementById("originalLink").innerHTML = json.url;
-        document.getElementById("shortLink").innerHTML = `${location.origin}/${json.id} <button type="button" class="btn btn-secondary btn-sm" id="copyButton" onclick="copyToClipboard()"><i class="bi-clipboard2"></i></button>`;
+        document.getElementById("originalLink").textContent = json.url;
+
+        const shortLinkEl = document.getElementById("shortLink");
+        shortLinkEl.href = shortUrl;
+        shortLinkEl.textContent = shortUrl;
+
+        const resultCard = document.getElementById("resultCard");
+        resultCard.classList.remove("visible");
+        // Force reflow to restart animation
+        void resultCard.offsetWidth;
+        resultCard.classList.add("visible");
+      };
+
+      const clearError = () => {
+        document.getElementById("urlInput").classList.remove("is-invalid");
+        document.getElementById("urlValidationFeedback").classList.remove("visible");
       };
 
       const displayError = () => {
         document.getElementById("urlInput").classList.add("is-invalid");
-        document.getElementById("urlValidationFeedback").style.visibility = "visible";
+        document.getElementById("urlValidationFeedback").classList.add("visible");
       };
 
       const copyToClipboard = () => {
-        const shortLink = document.getElementById("shortLink");
-        navigator.clipboard.writeText(shortLink.innerHTML.split(" ")[0]);
+        const shortUrl = document.getElementById("shortLink").href;
+        navigator.clipboard.writeText(shortUrl).then(() => {
+          const btn = document.getElementById("copyButton");
+          btn.classList.add("copied");
+          btn.innerHTML = '<i class="bi bi-check-lg"></i> Copied!';
+          setTimeout(() => {
+            btn.classList.remove("copied");
+            btn.innerHTML = '<i class="bi bi-clipboard2"></i> Copy';
+          }, 2000);
+        });
       };
     </script>
   </head>
 
   <body>
-    <div class="container">
-      <div class="row">
-        <div class="col">
-          <h1 class="text-center">TLDR</h1>
+    <div class="main-card">
+      <div class="text-center mb-2">
+        <div class="logo">TLDR</div>
+        <p class="tagline">Paste a long URL. Get something shorter.</p>
+      </div>
+
+      <div class="input-group-custom">
+        <input
+          type="url"
+          class="url-input"
+          placeholder="https://example.com/very/long/url"
+          aria-label="URL to be shortened"
+          id="urlInput"
+          required
+        >
+        <div id="urlValidationFeedback" class="error-msg">
+          Please enter a valid URL (include https://)
         </div>
       </div>
-      <div class="row">
-        <div class="col">
-          <p class="text-center">The greatest URL shortener ever</p>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-12 mb-3">
-          <input
-            type="url"
-            class="form-control"
-            placeholder="https://example.com"
-            aria-label="URL to be shortened"
-            aria-describedby="basic-addon2"
-            id="urlInput"
-            required
-          >
-          <div style="visibility:hidden;" id="urlValidationFeedback" class="invalid-feedback">
-            Please provide a valid URL
-          </div>
-        </div>
-        <div class="mb-3 text-center">
-          <button type="button" class="btn btn-primary" id="submitButton" onclick="shorten()">TLDRize</button>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col">
-          <b><p style="visibility:hidden;" class="text-center mb-0" id="originalLinkTitle">Original link: </p></b>
-          <p class="text-center" id="originalLink"></p>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col">
-          <b><p style="visibility:hidden;" class="text-center mb-0" id="shortLinkTitle">Short link: </p></b>
-          <p class="text-center" id="shortLink"></p>
+
+      <button type="button" class="btn-shorten" id="submitButton" onclick="shorten()">
+        TLDRize &rarr;
+      </button>
+
+      <div id="resultCard" class="result-card">
+        <div class="result-label">Original</div>
+        <div class="result-original" id="originalLink"></div>
+        <hr class="result-divider">
+        <div class="result-label">Short link</div>
+        <div class="result-short-row">
+          <a href="#" class="result-short-link" id="shortLink" target="_blank" rel="noopener"></a>
+          <button type="button" class="btn-copy" id="copyButton" onclick="copyToClipboard()">
+            <i class="bi bi-clipboard2"></i> Copy
+          </button>
         </div>
       </div>
     </div>
