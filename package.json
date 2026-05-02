@@ -17,7 +17,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.4",
     "express": "^4.22.1",
-    "googleapis": "^133.0.0",
+    "googleapis": "^171.4.0",
     "got": "^14.2.0",
     "mongoose": "^8.9.5",
     "nanoid": "^5.0.9"
