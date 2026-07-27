@@ -19,7 +19,7 @@
     "express": "^4.22.2",
     "googleapis": "^171.4.0",
     "got": "^14.2.0",
-    "mongoose": "^8.22.1",
+    "mongoose": "^8.24.1",
     "nanoid": "^5.0.9"
   },
   "devDependencies": {
