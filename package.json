@@ -20,7 +20,7 @@
     "googleapis": "^171.4.0",
     "got": "^14.2.0",
     "mongoose": "^8.24.1",
-    "nanoid": "^5.0.9"
+    "nanoid": "^5.1.16"
   },
   "devDependencies": {
     "nodemon": "^3.0.3"
